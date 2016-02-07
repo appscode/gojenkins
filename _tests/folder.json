@@ -1,0 +1,34 @@
+{
+    "actions": [
+        {},
+        {}
+    ],
+    "description": "",
+    "displayName": "banana",
+    "displayNameOrNull": null,
+    "name": "banana",
+    "url": "http://127.0.0.1:8080/jenkins/job/banana/",
+    "healthReport": [],
+    "jobs": [
+        {
+            "name": "banana-job-one",
+            "url": "http://127.0.0.1:8080/jenkins/job/banana/job/banana-job-one/",
+            "color": "blue"
+        },
+        {
+            "name": "banana-job-two",
+            "url": "http://127.0.0.1:8080/jenkins/job/banana/job/banana-job-two/",
+            "color": "notbuilt"
+        }
+    ],
+    "primaryView": {
+        "name": "All",
+        "url": "http://127.0.0.1:8080/jenkins/job/banana/"
+    },
+    "views": [
+        {
+            "name": "All",
+            "url": "http://127.0.0.1:8080/jenkins/job/banana/"
+        }
+    ]
+}

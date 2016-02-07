@@ -45,6 +45,7 @@ var paths = map[string]func(http.ResponseWriter, *http.Request){
 	"/computer/(master)/api/json": func(rw http.ResponseWriter, req *http.Request) { fmt.Fprintln(rw, readJson("node1.json")) },
 	"/pluginManager/api/json":     func(rw http.ResponseWriter, req *http.Request) { fmt.Fprintln(rw, readJson("plugins.json")) },
 	"/view/test/api/json":         func(rw http.ResponseWriter, req *http.Request) { fmt.Fprintln(rw, readJson("view1.json")) },
+	"/job/banana/api/json":        func(rw http.ResponseWriter, req *http.Request) { fmt.Fprintln(rw, readJson("folder.json")) },
 }
 
 func init() {
@@ -55,6 +56,7 @@ func init() {
 		testMux.HandleFunc(route, f)
 	}
 	jenkins.Init()
+	fmt.Println("Testing Basic Jenkins tests")
 }
 
 func TestGetAllJobs(t *testing.T) {

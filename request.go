@@ -24,6 +24,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 // Request Methods
@@ -148,7 +150,6 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 	} else {
-
 		req, err = http.NewRequest(method, url, payload)
 		if err != nil {
 			Error.Println(err.Error())
@@ -165,8 +166,21 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 			req.Header.Add(k, r.Headers.Get(k))
 		}
 	}
-
 	r.LastResponse, err = r.Client.Do(req)
+	if err != nil || r.LastResponse == nil {
+		body := ioutil.NopCloser(bytes.NewBuffer([]byte{}))
+
+		r.LastResponse = &http.Response{
+			StatusCode: 404,
+			Status:     "404 Not Found",
+			Body:       body,
+		}
+	}
+	if r.LastResponse.StatusCode != 200 && r.LastResponse.StatusCode != 400 {
+		st, err := ioutil.ReadAll(r.LastResponse.Body)
+		glog.V(6).Infoln(string(st), err)
+
+	}
 
 	if err != nil {
 		return nil, err
@@ -187,7 +201,6 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 
 func (r *Requester) ReadRawResponse(responseStruct interface{}) (*http.Response, error) {
 	defer r.LastResponse.Body.Close()
-
 	content, err := ioutil.ReadAll(r.LastResponse.Body)
 	if str, ok := responseStruct.(*string); ok {
 		*str = string(content)

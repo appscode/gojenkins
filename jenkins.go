@@ -209,6 +209,20 @@ func (j *Jenkins) GetJob(id string) (*Job, error) {
 	return nil, errors.New(strconv.Itoa(status))
 }
 
+// Get the folder by name. Folder will be initiated by
+// Cloudbees folder plugin.
+func (j *Jenkins) GetFolder(id string) (*Folder, error) {
+	folder := Folder{Jenkins: j, Raw: new(folderResponse), Base: "/job/" + id}
+	status, err := folder.Poll()
+	if err != nil {
+		return nil, err
+	}
+	if status == 200 {
+		return &folder, nil
+	}
+	return nil, errors.New(strconv.Itoa(status))
+}
+
 func (j *Jenkins) GetAllNodes() []*Node {
 	computers := new(Computers)
 	j.Requester.GetJSON("/computer", computers, nil)
