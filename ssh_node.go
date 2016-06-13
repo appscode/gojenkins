@@ -12,6 +12,7 @@ type SSHNodeCreateOptions struct {
 	Executors   int
 	RemoteFS    string
 	LabelString string
+	Mode        string
 
 	Host         string
 	Port         string
@@ -25,7 +26,9 @@ func (j *Jenkins) CreateSSHNode(obj *SSHNodeCreateOptions) (*Node, error) {
 	}
 	node = &Node{Jenkins: j, Raw: new(nodeResponse), Base: "/computer/" + obj.Name}
 	NODE_TYPE := "hudson.slaves.DumbSlave$DescriptorImpl"
-	MODE := "EXCLUSIVE"
+	if obj.Mode == "" {
+		obj.Mode = "NORMAL" // EXCLUSIVE
+	}
 	qr := map[string]string{
 		"name": obj.Name,
 		"type": NODE_TYPE,
@@ -35,7 +38,7 @@ func (j *Jenkins) CreateSSHNode(obj *SSHNodeCreateOptions) (*Node, error) {
 			"remoteFS":        obj.RemoteFS,
 			"numExecutors":    obj.Executors,
 			"labelString":     url.QueryEscape(obj.LabelString),
-			"mode":            MODE,
+			"mode":            obj.Mode,
 			"type":            NODE_TYPE,
 			"": []string{
 				"hudson.plugins.sshslaves.SSHLauncher",
