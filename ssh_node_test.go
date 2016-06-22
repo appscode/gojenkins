@@ -1,18 +1,18 @@
 package gojenkins
 
 import (
-	"flag"
 	"fmt"
 	"github.com/golang/glog"
 	"testing"
+	"appscode/pkg/util/flags"
 )
 
 var njenkins *Jenkins
 
 func init() {
-	flag.Set("v", "10")
+	flags.SetLogLevel(10)
 	var err error
-	njenkins, err = CreateJenkins("http://45.55.138.245:8080/", "admin", "tigerworks").Init()
+	njenkins, err = CreateJenkins("https://jenkins.appscode.com", "meta.system-admin", "ohmy").Init()
 	if err != nil {
 		fmt.Println(err)
 		glog.Fatal(err)
@@ -23,7 +23,7 @@ func TestNodeCreate(t *testing.T) {
 	req := &SSHNodeCreateOptions{
 		Name:        "test-from-go-2",
 		Description: "hello",
-		LabelString: "appscode:test",
+		LabelString: "test",
 		RemoteFS:    "/var/lib/jenkins",
 		Executors:   2,
 

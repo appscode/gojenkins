@@ -168,7 +168,7 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 	}
 	r.LastResponse, err = r.Client.Do(req)
 	if err != nil || r.LastResponse == nil {
-		body := ioutil.NopCloser(bytes.NewBuffer([]byte{}))
+		body := ioutil.NopCloser(bytes.NewBuffer([]byte("{}")))
 
 		r.LastResponse = &http.Response{
 			StatusCode: 404,
@@ -177,8 +177,8 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 		}
 	}
 	if r.LastResponse.StatusCode != 200 && r.LastResponse.StatusCode != 400 {
-		st, err := ioutil.ReadAll(r.LastResponse.Body)
-		glog.V(6).Infoln(string(st), err)
+		st, readErr := ioutil.ReadAll(r.LastResponse.Body)
+		glog.V(6).Infoln(string(st), readErr)
 
 	}
 
@@ -187,6 +187,8 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 	}
 
 	switch responseStruct.(type) {
+	case nil:
+		return r.LastResponse, nil
 	case *string:
 		rawResponse, err := r.ReadRawResponse(responseStruct)
 		if err != nil {
@@ -194,8 +196,8 @@ func (r *Requester) Do(method string, endpoint string, payload io.Reader, respon
 		}
 		return rawResponse, nil
 	default:
-		jsonResponse := r.ReadJSONResponse(responseStruct)
-		return jsonResponse, nil
+		jsonResponse, err := r.ReadJSONResponse(responseStruct)
+		return jsonResponse, err
 	}
 }
 
@@ -213,8 +215,8 @@ func (r *Requester) ReadRawResponse(responseStruct interface{}) (*http.Response,
 	return r.LastResponse, nil
 }
 
-func (r *Requester) ReadJSONResponse(responseStruct interface{}) *http.Response {
+func (r *Requester) ReadJSONResponse(responseStruct interface{}) (*http.Response, error) {
 	defer r.LastResponse.Body.Close()
-	json.NewDecoder(r.LastResponse.Body).Decode(responseStruct)
-	return r.LastResponse
+	err := json.NewDecoder(r.LastResponse.Body).Decode(responseStruct)
+	return r.LastResponse, err
 }

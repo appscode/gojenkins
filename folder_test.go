@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/stretchr/testify/assert"
+	"log"
 )
 
 const (
@@ -62,7 +63,7 @@ var (
 // to test with the mock tester. but mock tester will not provide us the phabricator
 // login and militancy checkups.
 func init() {
-	fJenkins, _ = CreateJenkins("http://localhost:8080/jenkins/", "banana.buser", "buser09").Init()
+	fJenkins, _ = CreateJenkins("https://jenkins.appscode.com", "tigerworks.system-admin", "ohmy").Init()
 	fmt.Println("Running APPSCODE tests.")
 }
 
@@ -82,7 +83,7 @@ func TestGetFolder(t *testing.T) {
 func TestGetAllFolderJobs(t *testing.T) {
 	fmt.Println("[TEST] Testing Get All Folder Job")
 	f, _ := fJenkins.GetFolder("banana")
-	jobs := f.GetAllJob()
+	jobs := f.GetJobs()
 	for _, job := range jobs {
 		fmt.Println(job.Name, job.Color)
 	}
@@ -187,5 +188,33 @@ func errorHandler(err error) {
 	if err != nil {
 		fmt.Println("Error Occured", err)
 		os.Exit(1)
+	}
+}
+
+func TestGetInnerJobs(t *testing.T) {
+	fmt.Println("[TEST] Testing Inner Job")
+	f, err := fJenkins.GetFolder("tigerworks")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jobs := f.GetJobs()
+	for _, job := range jobs {
+		fmt.Println(job.Name)
+	}
+	fmt.Println("==================================")
+	jobs = f.GetInnerJobs("/job/this-is-folder/")
+	for _, job := range jobs {
+		fmt.Println(job.Name)
+	}
+	fmt.Println("==================================")
+	jobs = f.GetInnerJobs("")
+	for _, job := range jobs {
+		fmt.Println(job.Name)
+	}
+	fmt.Println("==================================")
+	jobs = f.GetInnerJobs("/job/tamal/")
+	for _, job := range jobs {
+		fmt.Println(job.Name)
 	}
 }

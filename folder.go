@@ -3,6 +3,7 @@ package gojenkins
 import (
 	"errors"
 	"strconv"
+	"strings"
 )
 
 type Folder struct {
@@ -42,6 +43,7 @@ func (f *Folder) GetDetails() *folderResponse {
 }
 
 func (f *Folder) Poll() (int, error) {
+	f.Raw = new(folderResponse)
 	_, err := f.Jenkins.Requester.GetJSON(f.Base, f.Raw, nil)
 	if err != nil {
 		return 0, err
@@ -49,8 +51,20 @@ func (f *Folder) Poll() (int, error) {
 	return f.Jenkins.Requester.LastResponse.StatusCode, nil
 }
 
-func (f *Folder) GetAllJob() []*job {
+func (f *Folder) GetJobs() []*job {
 	f.Poll()
+	return f.Raw.Jobs
+}
+
+func (f *Folder) GetInnerJobs(parents string) []*job {
+	f.Raw = new(folderResponse)
+	if strings.TrimSpace(parents) != "" {
+		parents = "/job/" + parents
+	}
+	_, err := f.Jenkins.Requester.GetJSON(f.Base + parents, f.Raw, nil)
+	if err != nil {
+		return nil
+	}
 	return f.Raw.Jobs
 }
 
