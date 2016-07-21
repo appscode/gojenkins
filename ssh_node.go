@@ -2,8 +2,8 @@ package gojenkins
 
 import (
 	"errors"
-	"strconv"
 	"net/url"
+	"strconv"
 )
 
 type SSHNodeCreateOptions struct {

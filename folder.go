@@ -61,7 +61,7 @@ func (f *Folder) GetInnerJobs(parents string) []*job {
 	if strings.TrimSpace(parents) != "" {
 		parents = "/job/" + parents
 	}
-	_, err := f.Jenkins.Requester.GetJSON(f.Base + parents, f.Raw, nil)
+	_, err := f.Jenkins.Requester.GetJSON(f.Base+parents, f.Raw, nil)
 	if err != nil {
 		return nil
 	}

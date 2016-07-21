@@ -18,8 +18,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type Job struct {
@@ -41,8 +43,8 @@ type job struct {
 
 type parameterDefinition struct {
 	DefaultParameterValue struct {
-		Name  string `json:"name"`
-		Value bool   `json:"value"`
+		Name  string      `json:"name"`
+		Value interface{} `json:"value"`
 	} `json:"defaultParameterValue"`
 	Description string `json:"description"`
 	Name        string `json:"name"`
@@ -84,6 +86,12 @@ type jobResponse struct {
 	Scm              struct{}    `json:"scm"`
 	UpstreamProjects []job       `json:"upstreamProjects"`
 	URL              string      `json:"url"`
+}
+
+type history struct {
+	BuildNumber    int
+	BuildStatus    string
+	BuildTimestamp int64
 }
 
 func (j *Job) GetName() string {
@@ -395,4 +403,19 @@ func (j *Job) Poll() (int, error) {
 		return 0, err
 	}
 	return j.Jenkins.Requester.LastResponse.StatusCode, nil
+}
+
+func (j *Job) History() ([]*history, error) {
+	endpoint := j.Raw.URL[strings.Index(j.Raw.URL, "/job"):]
+	if !strings.HasSuffix(endpoint, "/") {
+		endpoint += "/"
+	}
+	endpoint += "buildHistory/ajax"
+	fmt.Println(endpoint)
+
+	resp, err := j.Jenkins.Requester.Get(endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return parseBuildHistory(resp.Body), nil
 }

@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"github.com/golang/glog"
 	"testing"
-	"appscode/pkg/util/flags"
 )
 
 var njenkins *Jenkins
 
 func init() {
-	flags.SetLogLevel(10)
 	var err error
 	njenkins, err = CreateJenkins("https://jenkins.appscode.com", "meta.system-admin", "ohmy").Init()
 	if err != nil {
