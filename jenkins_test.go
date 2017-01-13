@@ -3,6 +3,7 @@ package gojenkins
 import (
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -69,6 +70,32 @@ func TestCreateBuilds(t *testing.T) {
 		assert.True(t, (len(builds) > 0))
 
 	}
+}
+
+func TestBuildHistory(t *testing.T) {
+	job1ID := "Job1_test"
+	job2ID := "Job2_test"
+
+	j1, err := jenkins.GetJob(job1ID)
+	assert.Nil(t, err)
+	h1, err := j1.History()
+	assert.Nil(t, err)
+	assert.True(t, (len(h1) == 1))
+
+	j2, err := jenkins.GetJob(job2ID)
+	assert.Nil(t, err)
+	h2, err := j2.History()
+	assert.Nil(t, err)
+	assert.True(t, (len(h2) == 1))
+}
+
+func TestParseBuildHistory(t *testing.T) {
+	r, err := os.Open("_tests/build_history.txt")
+	if err != nil {
+		panic(err)
+	}
+	history := parseBuildHistory(r)
+	assert.True(t, len(history) == 3)
 }
 
 func TestCreateViews(t *testing.T) {
