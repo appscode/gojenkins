@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/TamalSaha/go-oneliners"
 )
 
 // Request Methods
@@ -234,9 +235,11 @@ func (r *Requester) Do(ar *APIRequest, responseStruct interface{}, options ...in
 		req.Header.Add(k, ar.Headers.Get(k))
 	}
 
+	oneliners.DumpHttpRequest(req)
 	if response, err := r.Client.Do(req); err != nil {
 		return nil, err
 	} else {
+		oneliners.DumpHttpResponse(response)
 		errorText := response.Header.Get("X-Error")
 		if errorText != "" {
 			return nil, errors.New(errorText)
